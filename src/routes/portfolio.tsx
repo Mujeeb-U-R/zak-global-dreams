@@ -6,6 +6,7 @@ import { Layout } from "@/components/site/Layout";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { useApplyModal } from "@/components/site/ApplyModalProvider";
 import { VISA_CATALOG, COUNTRY_FLAG } from "@/lib/site";
+import portfolioHero from "@/assets/portfolio-hero.jpg.asset.json";
 
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
