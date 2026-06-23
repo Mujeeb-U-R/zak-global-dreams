@@ -5,7 +5,6 @@ import { SiteFooter } from "./SiteFooter";
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="relative min-h-screen">
-      {/* Atmospheric ambient orbs */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 left-1/2 h-[700px] w-[700px] -translate-x-1/2 rounded-full bg-amber-500/[0.05] blur-[120px]" />
         <div className="absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-amber-700/[0.04] blur-[140px]" />
@@ -16,6 +15,3 @@ export function Layout({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
-/* shared input style */
-declare global { interface Window {} }
