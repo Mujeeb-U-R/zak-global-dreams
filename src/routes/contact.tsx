@@ -6,6 +6,7 @@ import { Layout } from "@/components/site/Layout";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { SITE } from "@/lib/site";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import contactHero from "@/assets/contact-hero.jpg.asset.json";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
