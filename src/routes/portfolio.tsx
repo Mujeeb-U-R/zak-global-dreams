@@ -38,7 +38,20 @@ function PortfolioPage() {
 
   return (
     <Layout>
-      <section className="relative pb-12">
+      <section className="relative overflow-hidden pb-12">
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px]">
+          <img
+            src={portfolioHero.url}
+            alt=""
+            aria-hidden="true"
+            width={1920}
+            height={1080}
+            fetchPriority="high"
+            decoding="async"
+            className="h-full w-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/80 to-slate-950" />
+        </div>
         <div className="mx-auto max-w-7xl px-6 pt-12">
           <SectionHeading
             eyebrow="Visa Portfolio"
