@@ -124,15 +124,15 @@
 }
 
 @utility glass-panel {
-  background: oklch(0.2 0.018 260 / 40%);
+  background: oklch(1 0 0 / 70%);
   backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid oklch(1 0 0 / 8%);
+  border: 1px solid oklch(0.62 0.14 72 / 18%);
 }
 
 @utility glass-panel-strong {
-  background: oklch(0.16 0.018 260 / 70%);
+  background: oklch(1 0 0 / 85%);
   backdrop-filter: blur(28px) saturate(160%);
-  border: 1px solid oklch(1 0 0 / 10%);
+  border: 1px solid oklch(0.62 0.14 72 / 25%);
 }
 
 @utility gold-glow {
