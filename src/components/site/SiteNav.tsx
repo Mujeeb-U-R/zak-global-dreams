@@ -34,9 +34,7 @@ export function SiteNav() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div
-          className={`flex items-center justify-between rounded-2xl px-5 py-3 transition-all duration-500 ${
-            scrolled ? "glass-panel-strong" : "glass-panel"
-          }`}
+          className={`flex items-center justify-between rounded-2xl px-5 py-3 transition-all duration-500 dark-panel`}
         >
           <Link to="/" className="group flex items-center gap-3">
             <span className="grid h-9 w-9 place-items-center rounded-lg border border-gold/40 bg-gold/5 font-display text-lg font-semibold text-gold-gradient">
