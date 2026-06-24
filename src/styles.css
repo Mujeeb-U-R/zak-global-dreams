@@ -135,6 +135,13 @@
   border: 1px solid oklch(0.62 0.14 72 / 25%);
 }
 
+@utility dark-panel {
+  background: oklch(0.22 0.04 70 / 92%);
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid oklch(0.62 0.14 72 / 20%);
+  box-shadow: 0 20px 60px -20px oklch(0.22 0.04 70 / 50%);
+}
+
 @utility gold-glow {
   box-shadow: var(--shadow-gold);
   transition: box-shadow 500ms ease, transform 500ms ease, border-color 500ms ease;
