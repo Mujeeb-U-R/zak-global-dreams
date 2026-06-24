@@ -93,7 +93,7 @@ export function SiteNav() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mt-2 flex flex-col gap-1 rounded-2xl glass-panel-strong p-4 md:hidden"
+              className="mt-2 flex flex-col gap-1 rounded-2xl dark-panel p-4 md:hidden"
             >
               {NAV.map((item) => (
                 <Link
