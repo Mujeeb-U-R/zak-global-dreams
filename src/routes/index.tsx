@@ -297,7 +297,6 @@ function Categories() {
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ delay: i * 0.1, duration: 0.7, ease: "easeOut" }}
                 
-                // Optimized interactive states for cross-device support (desktop hover & mobile tap)
                 whileHover={{ y: -4, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 
@@ -367,14 +366,16 @@ function ClientTicker() {
       </div>
 
       <div className="relative flex w-full items-center overflow-x-hidden">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
+        {/* Adjusted gradient fades for smaller viewports */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
 
-        <div className="flex gap-6 move-reverse-track animate-marquee whitespace-nowrap min-w-full">
-          {[...HOMEPAGE_REVIEWS, ...HOMEPAGE_REVIEWS].map((r, i) => (
+        {/* OPTIMIZED: Uses hardware acceleration (will-change) and clean 3-part duplicating nodes to completely protect against gaps */}
+        <div className="flex gap-6 move-reverse-track animate-marquee whitespace-nowrap min-w-full will-change-transform">
+          {[...HOMEPAGE_REVIEWS, ...HOMEPAGE_REVIEWS, ...HOMEPAGE_REVIEWS].map((r, i) => (
             <div
               key={i}
-              className="inline-block w-[360px] shrink-0 rounded-2xl border border-white/10 bg-slate-950/40 backdrop-blur-sm p-6 whitespace-normal"
+              className="inline-block w-[300px] sm:w-[360px] shrink-0 rounded-2xl border border-white/10 bg-slate-900/90 p-5 sm:p-6 whitespace-normal shadow-xl select-none"
             >
               <Quote className="h-5 w-5 text-gold/50" />
               <p className="mt-4 font-serif text-sm leading-relaxed italic text-foreground">
@@ -399,15 +400,18 @@ function ClientTicker() {
 
       <style>{`
         @keyframes marquee {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(-50%); }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-33.33%, 0, 0); }
         }
         .move-reverse-track {
-          animation: marquee 42s linear infinite;
+          /* OPTIMIZED: Handed off rendering directly to the device GPU via hardware metrics */
+          animation: marquee 28s linear infinite;
           animation-direction: reverse;
         }
-        .move-reverse-track:hover {
-          animation-play-state: paused;
+        @media (hover: hover) {
+          .move-reverse-track:hover {
+            animation-play-state: paused;
+          }
         }
       `}</style>
     </section>

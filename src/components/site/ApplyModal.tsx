@@ -92,137 +92,141 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden"
         >
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
 
+          {/* OPTIMIZED: Added max-h-[85vh] and flex-col to force the popup to remain perfectly sized inside mobile frames */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="relative my-12 w-full max-w-2xl glass-panel-strong rounded-3xl p-6 sm:p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]"
+            className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-none glass-panel-strong rounded-3xl p-6 sm:p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] flex flex-col"
           >
-            {/* FIXED: Shifted padding bounding region, added background colors, and set explicit top/right constraints for crisp mobile visibility */}
+            {/* FIXED Close button coordinate system – forced outside of the inner scrolling frame */}
             <motion.button
               whileTap={{ scale: 0.90 }}
               onClick={onClose}
-              className="absolute right-4 top-4 z-50 p-2.5 rounded-full border border-white/10 bg-slate-900/90 text-gold shadow-md backdrop-blur-sm transition-colors hover:border-gold/40 hover:text-foreground active:bg-slate-800 flex items-center justify-center"
+              className="absolute right-4 top-4 z-50 p-2.5 rounded-full border border-white/10 bg-slate-900/95 text-gold shadow-md backdrop-blur-sm transition-colors hover:border-gold/40 hover:text-foreground active:bg-slate-800 flex items-center justify-center"
               aria-label="Close"
             >
               <X className="h-5 w-5" />
             </motion.button>
 
-            <header className="mb-8 pr-8">
-              <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Visa Assessment</p>
-              <h2 className="mt-3 font-display text-3xl text-foreground sm:text-4xl">
-                Begin your <span className="text-gold-gradient">journey</span>
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Share a few details. We'll route you directly to a senior consultant on WhatsApp.
-              </p>
-            </header>
-
-            <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
-              
-              <Field label="First Name" error={errors.firstName}>
-                <input
-                  value={form.firstName}
-                  onChange={(e) => update("firstName", e.target.value)}
-                  placeholder="Enter your first name"
-                  className="input-base text-base"
-                />
-              </Field>
-
-              <Field label="Last Name" error={errors.lastName}>
-                <input
-                  value={form.lastName}
-                  onChange={(e) => update("lastName", e.target.value)}
-                  placeholder="Enter your last name"
-                  className="input-base text-base"
-                />
-              </Field>
-
-              <Field label="Phone Number" error={errors.phone}>
-                <input
-                  value={form.phone}
-                  onChange={(e) => update("phone", e.target.value)}
-                  type="tel"
-                  placeholder="+92 3xx xxxxxxx"
-                  className="input-base text-base"
-                />
-              </Field>
-
-              <Field label="Destination Country" error={errors.destination}>
-                <input
-                  value={form.destination}
-                  onChange={(e) => update("destination", e.target.value)}
-                  list="dest-list"
-                  placeholder="e.g. Turkey"
-                  className="input-base text-base"
-                />
-                <datalist id="dest-list">
-                  {VISA_CATALOG.flatMap((c) => c.countries).map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-              </Field>
-
-              <Field label="Visa Category">
-                <select 
-                  value={form.category} 
-                  onChange={(e) => update("category", e.target.value as (typeof CATEGORIES)[number])} 
-                  className="input-base text-base bg-slate-900"
-                >
-                  {CATEGORIES.map((c) => <option key={c} className="bg-slate-900">{c}</option>)}
-                </select>
-              </Field>
-
-              <Field label="Employment Status">
-                <select 
-                  value={form.employment} 
-                  onChange={(e) => update("employment", e.target.value as (typeof EMPLOYMENT)[number])} 
-                  className="input-base text-base bg-slate-900"
-                >
-                  {EMPLOYMENT.map((c) => <option key={c} className="bg-slate-900">{c}</option>)}
-                </select>
-              </Field>
-
-              <Field label="6-Month Bank Statement Available?" className="sm:col-span-2">
-                <div className="flex gap-3">
-                  {(["Yes", "No"] as const).map((v) => (
-                    <motion.button
-                      whileTap={{ scale: 0.98 }}
-                      key={v}
-                      type="button"
-                      onClick={() => update("bankStatement", v)}
-                      className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition active:scale-[0.99] ${
-                        form.bankStatement === v
-                          ? "border-gold/60 bg-gold/10 text-gold"
-                          : "border-white/10 text-muted-foreground active:bg-white/5 active:border-white/20"
-                      }`}
-                    >
-                      {v}
-                    </motion.button>
-                  ))}
-                </div>
-              </Field>
-
-              <div className="sm:col-span-2 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5 pt-6">
-                <p className="text-xs text-muted-foreground text-center sm:text-left">
-                  Opens WhatsApp with your details pre-filled.
+            {/* OPTIMIZED INNER CONTENT VIEW: Forms scroll safely on mobile while header and close handlers stay pinned and visible */}
+            <div className="overflow-y-auto pr-2 sm:pr-0 scrollbar-thin w-full flex-1">
+              <header className="mb-8 pr-12">
+                <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Visa Assessment</p>
+                <h2 className="mt-3 font-display text-2xl text-foreground sm:text-4xl">
+                  Begin your <span className="text-gold-gradient">journey</span>
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Share a few details. We'll route you directly to a senior consultant on WhatsApp.
                 </p>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform disabled:opacity-60"
-                >
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  Send via WhatsApp
-                </motion.button>
-              </div>
-            </form>
+              </header>
+
+              <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
+                
+                <Field label="First Name" error={errors.firstName}>
+                  <input
+                    value={form.firstName}
+                    onChange={(e) => update("firstName", e.target.value)}
+                    placeholder="Enter your first name"
+                    className="input-base text-base"
+                  />
+                </Field>
+
+                <Field label="Last Name" error={errors.lastName}>
+                  <input
+                    value={form.lastName}
+                    onChange={(e) => update("lastName", e.target.value)}
+                    placeholder="Enter your last name"
+                    className="input-base text-base"
+                  />
+                </Field>
+
+                <Field label="Phone Number" error={errors.phone}>
+                  <input
+                    value={form.phone}
+                    onChange={(e) => update("phone", e.target.value)}
+                    type="tel"
+                    placeholder="+92 3xx xxxxxxx"
+                    className="input-base text-base"
+                />
+                </Field>
+
+                <Field label="Destination Country" error={errors.destination}>
+                  <input
+                    value={form.destination}
+                    onChange={(e) => update("destination", e.target.value)}
+                    list="dest-list"
+                    placeholder="e.g. Turkey"
+                    className="input-base text-base"
+                  />
+                  <datalist id="dest-list">
+                    {VISA_CATALOG.flatMap((c) => c.countries).map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                </Field>
+
+                <Field label="Visa Category">
+                  <select 
+                    value={form.category} 
+                    onChange={(e) => update("category", e.target.value as (typeof CATEGORIES)[number])} 
+                    className="input-base text-base bg-slate-900"
+                  >
+                    {CATEGORIES.map((c) => <option key={c} className="bg-slate-900">{c}</option>)}
+                  </select>
+                </Field>
+
+                <Field label="Employment Status">
+                  <select 
+                    value={form.employment} 
+                    onChange={(e) => update("employment", e.target.value as (typeof EMPLOYMENT)[number])} 
+                    className="input-base text-base bg-slate-900"
+                  >
+                    {EMPLOYMENT.map((c) => <option key={c} className="bg-slate-900">{c}</option>)}
+                  </select>
+                </Field>
+
+                <Field label="6-Month Bank Statement Available?" className="sm:col-span-2">
+                  <div className="flex gap-3">
+                    {(["Yes", "No"] as const).map((v) => (
+                      <motion.button
+                        whileTap={{ scale: 0.98 }}
+                        key={v}
+                        type="button"
+                        onClick={() => update("bankStatement", v)}
+                        className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition active:scale-[0.99] ${
+                          form.bankStatement === v
+                            ? "border-gold/60 bg-gold/10 text-gold"
+                            : "border-white/10 text-muted-foreground active:bg-white/5 active:border-white/20"
+                        }`}
+                      >
+                        {v}
+                      </motion.button>
+                    ))}
+                  </div>
+                </Field>
+
+                <div className="sm:col-span-2 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5 pt-6 pb-2">
+                  <p className="text-xs text-muted-foreground text-center sm:text-left">
+                    Opens WhatsApp with your details pre-filled.
+                  </p>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform disabled:opacity-60"
+                  >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    Send via WhatsApp
+                  </motion.button>
+                </div>
+              </form>
+            </div>
           </motion.div>
         </motion.div>
       )}
