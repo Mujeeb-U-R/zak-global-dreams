@@ -16,7 +16,6 @@ export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
 });
 
-// FIXED: Removed file asset imports to support explicit link string structures natively
 const GRID = [
   { 
     src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80", 
@@ -108,21 +107,22 @@ function GalleryPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.7 }}
-                className="relative rounded-2xl border border-white/10 bg-slate-950/40 backdrop-blur-sm p-8 gold-glow-hover flex flex-col justify-between"
+                // OPTIMIZED: Applied high-contrast creamy white card styles and dark stone text parameters directly
+                className="relative rounded-[32px] bg-[#fdfbf7] border border-stone-200 p-8 shadow-2xl flex flex-col justify-between text-slate-900 select-none min-h-[240px]"
               >
                 <div>
-                  <Quote className="h-6 w-6 text-gold/60" />
-                  <p className="mt-5 font-serif text-lg leading-relaxed italic text-foreground">"{r.text}"</p>
+                  <Quote className="h-7 w-7 text-amber-600/20 stroke-[1.5]" />
+                  <p className="mt-4 font-serif text-base leading-relaxed italic text-stone-800">"{r.text}"</p>
                 </div>
                 
-                <footer className="mt-7 flex items-center justify-between border-t border-white/5 pt-5 text-sm">
+                <footer className="mt-7 flex items-center justify-between border-t border-stone-200 pt-5 text-sm">
                   <div>
-                    <div className="text-foreground font-medium">{r.name}</div>
-                    <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mt-0.5">{r.route}</div>
+                    <div className="text-stone-900 font-display font-semibold">{r.name}</div>
+                    <div className="text-[11px] font-mono uppercase tracking-wider text-amber-700/80 mt-0.5 font-medium">{r.route}</div>
                   </div>
-                  <div className="flex gap-0.5 shrink-0">
+                  <div className="flex gap-0.5 shrink-0 bg-stone-100 px-3 py-1.5 rounded-full border border-stone-200/60">
                     {Array.from({ length: 5 }).map((_, j) => (
-                      <Star key={j} className="h-3.5 w-3.5 fill-gold text-gold" />
+                      <Star key={j} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                     ))}
                   </div>
                 </footer>

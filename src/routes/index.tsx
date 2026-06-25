@@ -54,7 +54,6 @@ function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Programmatically force video playback to bypass browser autoplay restrictions
     if (videoRef.current) {
       videoRef.current.play().catch((err) => {
         console.log("Autoplay optimization caught restriction:", err);
@@ -261,6 +260,7 @@ function Categories() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
         >
+          {/* FIXED: Removed invalid eyref property cleanly */}
           <SectionHeading
             eyebrow="Our Practice"
             title={
@@ -356,64 +356,106 @@ function Categories() {
 }
 
 function ClientTicker() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-w: 640px)").matches;
+    const speedTimeout = isMobile ? 3500 : 6000;
+
+    const timer = setInterval(() => {
+      next();
+    }, speedTimeout);
+    return () => clearInterval(timer);
+  }, [index]);
+
+  const next = () => {
+    setIndex((prev) => (prev + 1) % HOMEPAGE_REVIEWS.length);
+  };
+
+  const prev = () => {
+    setIndex((prev) => (prev - 1 + HOMEPAGE_REVIEWS.length) % HOMEPAGE_REVIEWS.length);
+  };
+
   return (
-    <section className="relative py-12 overflow-hidden bg-transparent border-t border-b border-white/5">
-      <div className="mx-auto max-w-7xl px-6 mb-10">
+    <section className="relative py-20 bg-transparent border-t border-b border-white/5">
+      <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
         <SectionHeading
           eyebrow="Reviews"
           title={<>Client <span className="text-gold-gradient italic">Trust</span></>}
         />
-      </div>
-
-      <div className="relative flex w-full items-center overflow-x-hidden">
-        {/* Adjusted gradient fades for smaller viewports */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
-
-        {/* OPTIMIZED: Uses hardware acceleration (will-change) and clean 3-part duplicating nodes to completely protect against gaps */}
-        <div className="flex gap-6 move-reverse-track animate-marquee whitespace-nowrap min-w-full will-change-transform">
-          {[...HOMEPAGE_REVIEWS, ...HOMEPAGE_REVIEWS, ...HOMEPAGE_REVIEWS].map((r, i) => (
-            <div
-              key={i}
-              className="inline-block w-[300px] sm:w-[360px] shrink-0 rounded-2xl border border-white/10 bg-slate-900/90 p-5 sm:p-6 whitespace-normal shadow-xl select-none"
-            >
-              <Quote className="h-5 w-5 text-gold/50" />
-              <p className="mt-4 font-serif text-sm leading-relaxed italic text-foreground">
-                "{r.text}"
-              </p>
-              
-              <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4 text-xs">
-                <div>
-                  <div className="text-foreground font-medium">{r.name}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{r.route}</div>
-                </div>
-                <div className="flex gap-0.5 shrink-0">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} className="h-3 w-3 fill-gold text-gold" />
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
+        
+        <div className="flex items-center gap-3 self-end sm:self-auto z-20">
+          <motion.button
+            whileTap={{ scale: 0.90 }}
+            onClick={prev}
+            className="h-12 w-12 rounded-full border border-white/10 bg-slate-900/60 hover:border-gold/40 text-slate-300 hover:text-gold flex items-center justify-center transition-colors active:bg-slate-800 shadow-md"
+            aria-label="Previous review"
+          >
+            <ArrowRight className="h-5 w-5 rotate-180" />
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.90 }}
+            onClick={next}
+            className="h-12 w-12 rounded-full border border-white/10 bg-slate-900/60 hover:border-gold/40 text-slate-300 hover:text-gold flex items-center justify-center transition-colors active:bg-slate-800 shadow-md"
+            aria-label="Next review"
+          >
+            <ArrowRight className="h-5 w-5" />
+          </motion.button>
         </div>
       </div>
 
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(-33.33%, 0, 0); }
-        }
-        .move-reverse-track {
-          /* OPTIMIZED: Handed off rendering directly to the device GPU via hardware metrics */
-          animation: marquee 28s linear infinite;
-          animation-direction: reverse;
-        }
-        @media (hover: hover) {
-          .move-reverse-track:hover {
-            animation-play-state: paused;
-          }
-        }
-      `}</style>
+      <div className="relative w-full overflow-hidden px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative overflow-hidden w-full">
+            <motion.div
+              animate={{ x: `-${index * 100}%` }}
+              transition={{ type: "spring", stiffness: 250, damping: 25 }}
+              className="flex w-full will-change-transform"
+            >
+              {HOMEPAGE_REVIEWS.map((r, i) => (
+                <div
+                  key={i}
+                  className="w-full shrink-0 pr-0 sm:pr-6"
+                >
+                  <div className="w-full max-w-3xl mx-auto rounded-[32px] bg-[#fdfbf7] border border-stone-200 p-6 sm:p-12 shadow-2xl flex flex-col justify-between min-h-[250px] text-slate-900 select-none">
+                    <div>
+                      <Quote className="h-8 w-8 text-amber-600/20 stroke-[1.5]" />
+                      <p className="mt-4 font-serif text-sm sm:text-base leading-relaxed italic text-stone-800 whitespace-normal">
+                        "{r.text}"
+                      </p>
+                    </div>
+                    
+                    <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-stone-200 pt-6 text-sm">
+                      <div>
+                        <div className="text-stone-900 font-display font-semibold text-base">{r.name}</div>
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-amber-700/80 mt-0.5 font-medium">{r.route}</div>
+                      </div>
+                      <div className="flex gap-0.5 shrink-0 bg-stone-100 px-3 py-1.5 rounded-full border border-stone-200/60 self-start sm:self-auto">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <Star key={j} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 flex justify-center gap-2">
+        {HOMEPAGE_REVIEWS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            className={`h-2 transition-all duration-300 rounded-full ${
+              index === i ? "w-6 bg-gold" : "w-2 bg-white/20"
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
     </section>
   );
 }
