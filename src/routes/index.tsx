@@ -51,8 +51,16 @@ function HomePage() {
 
 function Hero() {
   const [scrollY, setScrollY] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    // Programmatically force video playback to bypass browser autoplay restrictions
+    if (videoRef.current) {
+      videoRef.current.play().catch((err) => {
+        console.log("Autoplay optimization caught restriction:", err);
+      });
+    }
+
     let raf = 0;
     const onScroll = () => {
       if (raf) cancelAnimationFrame(raf);
@@ -73,12 +81,14 @@ function Hero() {
     <section className="relative -mt-24 flex min-h-[100svh] items-center overflow-hidden bg-slate-950">
       <div className="absolute inset-0 z-0">
         <video
+          ref={videoRef}
           src="/hero-video.mp4"
           poster={heroPoster}
           autoPlay
           muted
           loop
           playsInline
+          {...{ "webkit-playsinline": "true" }}
           className="h-full w-full object-cover"
           style={{ opacity: Math.max(0.12, fade) }}
         />
@@ -235,7 +245,6 @@ function Counter({ target }: { target: number }) {
 function Categories() {
   return (
     <section className="relative py-28 overflow-hidden bg-transparent">
-      {/* Background vectors track */}
       <div className="absolute inset-x-0 top-0 -z-10 h-[600px] w-full opacity-20 pointer-events-none">
         <svg width="100%" height="100%" viewBox="0 0 1440 600" fill="none" className="w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M-100 150C300 450 650 -50 1100 250C1350 400 1500 200 1600 100" stroke="#b88939" strokeWidth="1.2" strokeDasharray="6 6" />
@@ -287,11 +296,14 @@ function Categories() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ delay: i * 0.1, duration: 0.7, ease: "easeOut" }}
-                className="group relative overflow-hidden rounded-[28px] border border-white/10 p-8 transition-all duration-500 ease-out hover:shadow-[0_20px_50px_rgba(184,137,57,0.15)] hover:-translate-y-1 flex flex-col justify-between min-h-[260px]"
+                
+                // Optimized interactive states for cross-device support (desktop hover & mobile tap)
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                
+                className="group relative overflow-hidden rounded-[28px] border border-white/10 p-8 transition-all duration-500 ease-out hover:shadow-[0_20px_50px_rgba(184,137,57,0.15)] flex flex-col justify-between min-h-[260px]"
               >
-                {/* --- BACKDROP IMAGE ELEMENT --- */}
                 <div className="absolute inset-0 -z-20 h-full w-full overflow-hidden">
-                  {/* FIXED: Shifted opacity rules up to 0.65 baseline and 0.85 on hover to fully showcase card imagery */}
                   <img 
                     src={currentBg} 
                     alt="" 
@@ -300,7 +312,6 @@ function Categories() {
                   />
                 </div>
                 
-                {/* --- FIXED: LIGHTENED OVERLAY GRADIENT SYSTEM (Matching image_0751a4.png structures) --- */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-950/70 via-slate-950/30 to-slate-950/90 transition-colors duration-500 group-hover:from-slate-950/60 group-hover:via-slate-950/20 group-hover:to-slate-950/85" />
 
                 <div>
@@ -321,7 +332,6 @@ function Categories() {
                   </p>
                 </div>
 
-                {/* Pill labels container segment */}
                 <div className="mt-8 flex flex-wrap gap-2 items-center pt-4 border-t border-white/10">
                   {c.countries.slice(0, 5).map((co) => (
                     <span 

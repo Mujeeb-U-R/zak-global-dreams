@@ -5,7 +5,6 @@ import { z } from "zod";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { VISA_CATALOG } from "@/lib/site";
 
-// FIXED: Adjusted schema rules from fullName to dedicated first/last validation hooks
 const schema = z.object({
   firstName: z.string().trim().min(2, "Please enter your first name").max(50),
   lastName: z.string().trim().min(2, "Please enter your last name").max(50),
@@ -26,7 +25,6 @@ interface Props {
 }
 
 export function ApplyModal({ isOpen, onClose, preset }: Props) {
-  // FIXED: Adjusted properties to break names into fine structural arrays
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -74,7 +72,6 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
     setErrors({});
     setSubmitting(true);
 
-    // FIXED: Remapped and structured names dynamically to feed down transparently to buildWhatsAppUrl
     const { firstName, lastName, ...rest } = result.data;
     const computedFullName = `${firstName} ${lastName}`.trim();
 
@@ -106,15 +103,17 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="relative my-12 w-full max-w-2xl glass-panel-strong rounded-3xl p-6 sm:p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]"
           >
-            <button
+            {/* OPTIMIZED: Sized bounding touch region to 44px equivalent via padding to assist small mobile selections */}
+            <motion.button
+              whileTap={{ scale: 0.90 }}
               onClick={onClose}
-              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-white/10 text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
+              className="absolute right-3 top-3 p-2 rounded-full border border-white/10 text-muted-foreground transition hover:border-gold/40 hover:text-foreground active:bg-white/5"
               aria-label="Close"
             >
-              <X className="h-4 w-4" />
-            </button>
+              <X className="h-5 w-5" />
+            </motion.button>
 
-            <header className="mb-8">
+            <header className="mb-8 pr-6">
               <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Visa Assessment</p>
               <h2 className="mt-3 font-display text-3xl text-foreground sm:text-4xl">
                 Begin your <span className="text-gold-gradient">journey</span>
@@ -126,13 +125,13 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
 
             <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
               
-              {/* FIXED: Removed the blocky single full name box for twin column input cards */}
               <Field label="First Name" error={errors.firstName}>
                 <input
                   value={form.firstName}
                   onChange={(e) => update("firstName", e.target.value)}
                   placeholder="Enter your first name"
-                  className="input-base"
+                  // OPTIMIZED: Implemented text-base (16px) baseline override to completely stop layout auto-zooms on iOS
+                  className="input-base text-base"
                 />
               </Field>
 
@@ -141,7 +140,7 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                   value={form.lastName}
                   onChange={(e) => update("lastName", e.target.value)}
                   placeholder="Enter your last name"
-                  className="input-base"
+                  className="input-base text-base"
                 />
               </Field>
 
@@ -149,8 +148,9 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                 <input
                   value={form.phone}
                   onChange={(e) => update("phone", e.target.value)}
+                  type="tel"
                   placeholder="+92 3xx xxxxxxx"
-                  className="input-base"
+                  className="input-base text-base"
                 />
               </Field>
 
@@ -160,7 +160,7 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                   onChange={(e) => update("destination", e.target.value)}
                   list="dest-list"
                   placeholder="e.g. Turkey"
-                  className="input-base"
+                  className="input-base text-base"
                 />
                 <datalist id="dest-list">
                   {VISA_CATALOG.flatMap((c) => c.countries).map((c) => (
@@ -170,48 +170,58 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
               </Field>
 
               <Field label="Visa Category">
-                <select value={form.category} onChange={(e) => update("category", e.target.value as (typeof CATEGORIES)[number])} className="input-base">
-                  {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+                <select 
+                  value={form.category} 
+                  onChange={(e) => update("category", e.target.value as (typeof CATEGORIES)[number])} 
+                  className="input-base text-base bg-slate-900"
+                >
+                  {CATEGORIES.map((c) => <option key={c} className="bg-slate-900">{c}</option>)}
                 </select>
               </Field>
 
               <Field label="Employment Status">
-                <select value={form.employment} onChange={(e) => update("employment", e.target.value as (typeof EMPLOYMENT)[number])} className="input-base">
-                  {EMPLOYMENT.map((c) => <option key={c}>{c}</option>)}
+                <select 
+                  value={form.employment} 
+                  onChange={(e) => update("employment", e.target.value as (typeof EMPLOYMENT)[number])} 
+                  className="input-base text-base bg-slate-900"
+                >
+                  {EMPLOYMENT.map((c) => <option key={c} className="bg-slate-900">{c}</option>)}
                 </select>
               </Field>
 
               <Field label="6-Month Bank Statement Available?" className="sm:col-span-2">
                 <div className="flex gap-3">
                   {(["Yes", "No"] as const).map((v) => (
-                    <button
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
                       key={v}
                       type="button"
                       onClick={() => update("bankStatement", v)}
-                      className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
+                      className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition active:scale-[0.99] ${
                         form.bankStatement === v
                           ? "border-gold/60 bg-gold/10 text-gold"
-                          : "border-white/10 text-muted-foreground hover:border-white/30"
+                          : "border-white/10 text-muted-foreground active:bg-white/5 active:border-white/20"
                       }`}
                     >
                       {v}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </Field>
 
-              <div className="sm:col-span-2 mt-2 flex items-center justify-between gap-3 border-t border-white/5 pt-6">
-                <p className="text-xs text-muted-foreground">
+              <div className="sm:col-span-2 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5 pt-6">
+                <p className="text-xs text-muted-foreground text-center sm:text-left">
                   Opens WhatsApp with your details pre-filled.
                 </p>
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
                   type="submit"
                   disabled={submitting}
-                  className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform hover:scale-[1.03] disabled:opacity-60"
+                  className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform disabled:opacity-60"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   Send via WhatsApp
-                </button>
+                </motion.button>
               </div>
             </form>
           </motion.div>
@@ -225,10 +235,10 @@ function Field({
   label, error, className, children,
 }: { label: string; error?: string; className?: string; children: React.ReactNode }) {
   return (
-    <label className={`flex flex-col gap-2 ${className ?? ""}`}>
+    <label className={`flex flex-col gap-2 w-full ${className ?? ""}`}>
       <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</span>
       {children}
-      {error && <span className="text-xs text-destructive">{error}</span>}
+      {error && <span className="text-xs text-destructive font-medium mt-0.5">{error}</span>}
     </label>
   );
 }

@@ -61,19 +61,21 @@ function PortfolioPage() {
             intro="Filter by category to see the destinations we actively process. Each card opens a tailored assessment."
           />
 
-          <div className="mt-12 flex flex-wrap gap-2">
+          {/* OPTIMIZED: Applied crisp horizontal touch scroll padding for clean, un-stacked mobile filter selections */}
+          <div className="mt-12 flex flex-wrap gap-2 max-w-full overflow-x-auto pb-2 scrollbar-none">
             {TABS.map((t) => (
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 key={t}
                 onClick={() => setActive(t)}
-                className={`relative rounded-full border px-5 py-2.5 text-xs uppercase tracking-[0.18em] transition ${
+                className={`relative rounded-full border px-5 py-2.5 text-xs uppercase tracking-[0.18em] transition whitespace-nowrap active:scale-95 ${
                   active === t
                     ? "border-gold/60 bg-gold/10 text-gold gold-glow"
-                    : "border-white/10 text-muted-foreground hover:border-white/30 hover:text-foreground"
+                    : "border-white/10 text-muted-foreground hover:border-white/30 hover:text-foreground active:bg-white/5"
                 }`}
               >
                 {t}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -94,13 +96,17 @@ function PortfolioPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.4 }}
-                    className="group relative overflow-hidden rounded-[32px] border border-white/10 p-7 transition-all duration-500 hover:-translate-y-1 shadow-2xl min-h-[380px] flex flex-col justify-between"
+                    
+                    // OPTIMIZED: Replaced raw hover layout translations with tactile mobile tap-scaling models
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    
+                    className="group relative overflow-hidden rounded-[32px] border border-white/10 p-7 transition-all duration-500 shadow-2xl min-h-[380px] flex flex-col justify-between select-none"
                     style={{ backgroundColor: "#060a12" }}
                   >
                     {/* BACKGROUND LAYER MATRIX */}
                     <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-[32px]">
                       {imageSource && (
-                        /* FIXED: Heightened baseline opacity to 0.65 and hover to 0.85 so landmarks are completely clear */
                         <img
                           src={imageSource}
                           alt=""
@@ -113,8 +119,6 @@ function PortfolioPage() {
                         />
                       )}
                       
-                      {/* FIXED: Lightened the middle (via) area to 30% black opacity so pictures show fully, 
-                          while retaining 95% at the bottom to guarantee text and form button legibility */}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-transparent" />
                     </div>
 
@@ -124,7 +128,7 @@ function PortfolioPage() {
                       {/* TOP ROW */}
                       <div className="flex items-center justify-between w-full">
                         <span className="text-4xl drop-shadow-md">{COUNTRY_FLAG[c.country] ?? "🌐"}</span>
-                        <span className="text-[10px] uppercase tracking-[0.25em] text-gold font-mono bg-slate-950/90 px-3 py-1 rounded-full border border-white/10">
+                        <span className="text-[10px] uppercase tracking-[0.25em] text-gold pointer-events-none font-mono bg-slate-950/90 px-3 py-1 rounded-full border border-white/10">
                           {c.category}
                         </span>
                       </div>
@@ -152,13 +156,15 @@ function PortfolioPage() {
                           </div>
                         </dl>
 
-                        <button
+                        {/* OPTIMIZED: Sized baseline target and mapped full interactive click tracking directly */}
+                        <motion.button
+                          whileTap={{ scale: 0.96 }}
                           onClick={() => open({ destination: c.country, category: c.category })}
-                          className="relative mt-6 inline-flex w-full items-center justify-between rounded-full border border-gold/60 bg-slate-950/90 px-5 py-3 text-xs uppercase tracking-[0.2em] text-gold backdrop-blur-md transition-all duration-300 hover:bg-gold hover:text-white hover:shadow-[0_4px_20px_rgba(184,137,57,0.4)]"
+                          className="relative mt-6 inline-flex w-full items-center justify-between rounded-full border border-gold/60 bg-slate-950/90 px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-gold backdrop-blur-md transition-all duration-300 hover:bg-gold hover:text-white active:bg-gold active:text-white hover:shadow-[0_4px_20px_rgba(184,137,57,0.4)]"
                         >
                           Check Eligibility
                           <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </button>
+                        </motion.button>
                       </div>
 
                     </div>
