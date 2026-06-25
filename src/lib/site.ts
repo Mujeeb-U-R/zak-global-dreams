@@ -1,20 +1,24 @@
 export const SITE = {
   name: "ZAK Consultants (Pvt.) Ltd.",
   short: "ZAK Consultants",
+  // Public path to the site logo. Using the uploaded transparent PNG.
+  logo: "/zak_logo-removebg-preview.png",
   tagline: "Your Trusted Partner for Global Visa Solutions",
   phoneDisplay: "+92 334 944 8824",
   whatsappNumber: "923349448824",
-  email: "info@zakconsultants.pk",
+  email: "zakconsultants21@gmail.com",
   address:
     "Office No. G-62, 5th Floor, GS Tower, Ring Road, Near Hayatabad Toll Plaza, Peshawar",
-  hours: "Daily: 12:30 PM – 11:30 PM",
-  legal: "Registered Private Limited Firm — SECP, Pakistan",
+  hours: "Monday-Saturday: 10:00 AM – 6:00 PM",
+  legal: "Registered Private Limited Firm, Pakistan",
+
+  mapLink: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3308.7342963349092!2d71.45425507435851!3d33.97366822187761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38d911d507fd6ddf%3A0x493a3de071281f6d!2sZAK%20Consultants%20(PVT.)%20LTD.!5e0!3m2!1sen!2sus!4v1782351036066!5m2!1sen!2sus",
 } as const;
 
 export type VisaCategory =
   | "Work Permit"
   | "Visit Visa"
-  | "Group Tour + Visit Visa"
+  | "Group Tour"
   | "Student Visa";
 
 export const VISA_CATALOG: {
@@ -39,7 +43,7 @@ export const VISA_CATALOG: {
     countries: ["U.S.A", "Canada", "Europe (Schengen)", "Japan"],
   },
   {
-    category: "Group Tour + Visit Visa",
+    category: "Group Tour",
     tagline: "Curated group departures with full hospitality.",
     processing: "10–30 days",
     duration: "7–21 day itineraries",

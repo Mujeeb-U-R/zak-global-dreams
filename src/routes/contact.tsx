@@ -21,14 +21,20 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  const [name, setName] = useState("");
+  // FIXED: Separated the single state context to handle separate tracking blocks cleanly
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState("");
 
   const send = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Combine names gracefully, defaulting back to 'Quick Inquiry' if blank values slip through
+    const computedFullName = `${firstName} ${lastName}`.trim() || "Quick Inquiry";
+
     const url = buildWhatsAppUrl({
-      fullName: name || "Quick Inquiry",
+      fullName: computedFullName,
       phone: phone || "—",
       destination: "—",
       category: "General Inquiry",
@@ -55,7 +61,7 @@ function ContactPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/80 to-slate-950" />
         </div>
-        <div className="mx-auto max-w-7xl px-6 pt-12">
+        <div className="mx-auto max-w-7xl px-6 relative pt-12">
           <SectionHeading
             eyebrow="Get in touch"
             title={<>Visit us in <span className="text-gold-gradient italic">Peshawar</span></>}
@@ -74,14 +80,22 @@ function ContactPage() {
             >
               <iframe
                 title="ZAK Consultants Office Map"
-                src="https://www.google.com/maps?q=Ring+Road+Hayatabad+Toll+Plaza+Peshawar&output=embed"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3308.7342963349092!2d71.45425507435851!3d33.97366822187761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38d911d507fd6ddf%3A0x493a3de071281f6d!2sZAK%20Consultants%20(PVT.)%20LTD.!5e0!3m2!1sen!2sus!4v1782351036066!5m2!1sen!2sus"
                 className="h-[380px] w-full grayscale-[40%]"
                 loading="lazy"
+                style={{ border: 0 }}
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
               />
             </motion.div>
 
             <div className="grid gap-px overflow-hidden rounded-3xl border border-white/5 sm:grid-cols-2">
-              <Info icon={MapPin} title="Office" lines={[SITE.address]} />
+              <Info 
+                icon={MapPin} 
+                title="Office (Click to Open Map)" 
+                lines={[SITE.address]} 
+                href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3308.7342963349092!2d71.45425507435851!3d33.97366822187761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38d911d507fd6ddf%3A0x493a3de071281f6d!2sZAK%20Consultants%20(PVT.)%20LTD.!5e0!3m2!1sen!2sus!4v1782351036066!5m2!1sen!2sus" 
+              />
               <Info icon={Clock} title="Hours" lines={[SITE.hours, "Open every day"]} />
               <Info icon={Phone} title="WhatsApp & Call" lines={[SITE.phoneDisplay]} href={`tel:+${SITE.whatsappNumber}`} />
               <Info icon={Mail} title="Email" lines={[SITE.email]} href={`mailto:${SITE.email}`} />
@@ -101,18 +115,29 @@ function ContactPage() {
             <p className="mt-2 text-sm text-muted-foreground">Sends directly to our WhatsApp.</p>
 
             <div className="mt-7 grid gap-5">
-              <label className="flex flex-col gap-2">
-                <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Your Name</span>
-                <input value={name} onChange={(e) => setName(e.target.value)} className="input-base" placeholder="Full name" />
-              </label>
+              
+              {/* FIXED: Replaced standard full name element with twin input elements layout split */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2">
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">First Name</span>
+                  <input required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="input-base" placeholder="First name" />
+                </label>
+                <label className="flex flex-col gap-2">
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Last Name</span>
+                  <input required value={lastName} onChange={(e) => setLastName(e.target.value)} className="input-base" placeholder="Last name" />
+                </label>
+              </div>
+
               <label className="flex flex-col gap-2">
                 <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Phone</span>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} className="input-base" placeholder="+92 3xx xxxxxxx" />
+                <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="input-base" placeholder="+92 3xx xxxxxxx" />
               </label>
+              
               <label className="flex flex-col gap-2">
                 <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Message</span>
                 <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={4} className="input-base resize-none" placeholder="Tell us where you'd like to travel..." />
               </label>
+              
               <button type="submit" className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform hover:scale-[1.02]">
                 <Send className="h-4 w-4" /> Send via WhatsApp
               </button>
@@ -129,9 +154,13 @@ function Info({
 }: { icon: typeof MapPin; title: string; lines: string[]; href?: string }) {
   const Tag: any = href ? "a" : "div";
   return (
-    <Tag href={href} className="block bg-slate-950/40 p-7 transition hover:bg-slate-900/60">
-      <Icon className="h-5 w-5 text-gold" />
-      <div className="mt-4 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{title}</div>
+    <Tag 
+      href={href} 
+      {...(href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="block bg-slate-950/40 p-7 transition hover:bg-slate-900/60 group cursor-pointer"
+    >
+      <Icon className="h-5 w-5 text-gold transition-transform group-hover:scale-110 duration-300" />
+      <div className="mt-4 text-[10px] uppercase tracking-[0.25em] text-muted-foreground group-hover:text-gold transition-colors duration-300">{title}</div>
       {lines.map((l, i) => (<p key={i} className="mt-1 text-sm text-foreground">{l}</p>))}
     </Tag>
   );

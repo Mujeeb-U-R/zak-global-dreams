@@ -3,9 +3,6 @@ import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { Layout } from "@/components/site/Layout";
 import { SectionHeading } from "@/components/site/SectionHeading";
-import g1 from "@/assets/gallery-1.jpg";
-import g2 from "@/assets/gallery-2.jpg";
-import g3 from "@/assets/gallery-3.jpg";
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -19,19 +16,47 @@ export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
 });
 
+// FIXED: Removed file asset imports to support explicit link string structures natively
 const GRID = [
-  { src: g1, h: "row-span-2", label: "Schengen Visa — Approved" },
-  { src: g2, h: "", label: "Premium Lounge — Istanbul" },
-  { src: g3, h: "", label: "Bosphorus — Türkiye Tour" },
-  { src: g2, h: "row-span-2", label: "Business Travel — Singapore" },
-  { src: g1, h: "", label: "U.K Student Visa — Granted" },
-  { src: g3, h: "", label: "Group Tour — Morocco" },
+  { 
+    src: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80", 
+    h: "row-span-2", 
+    label: "Schengen Visa — Approved" 
+  },
+  { 
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvF6i6EvIz5nWFMqnnZSoOV2ZwaLEQxFSl2_9RtfYDa8e507mQH92nOkd2&s=10", 
+    h: "", 
+    label: "Premium Lounge — Istanbul" 
+  },
+  { 
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXISipfyA9YnH-HfSCRHEu3MQGwfAax3NiFDvMZSqY72saE9chmqtUckxE&s=10", 
+    h: "", 
+    label: "Bosphorus — Türkiye Tour" 
+  },
+  { 
+    src: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80", 
+    h: "row-span-2", 
+    label: "Business Travel — Singapore" 
+  },
+  { 
+    src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80", 
+    h: "", 
+    label: "U.K Student Visa — Granted" 
+  },
+  { 
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw3Z9pH13XcqMi-CilpcmKnt2eNW8WAIPQQXbtaFgtrRbR5eFJybl6WmY&s=10", 
+    h: "", 
+    label: "Group Tour — Morocco" 
+  },
 ];
 
 const REVIEWS = [
   { name: "Hamza R.", route: "Turkey Work Permit", text: "From profiling to embassy submission, every step felt deliberate. Approval came within the timeline they predicted." },
   { name: "Sana A.", route: "U.K Student Visa", text: "They restructured my SOP and financials in two evenings. The visa landed first attempt." },
   { name: "Bilal K.", route: "Schengen Visit Visa", text: "Calm, professional, and brutally precise with documentation. Worth every minute of the consultation." },
+  { name: "Zainab M.", route: "Canada Student Route", text: "The cross-checking system they used for my study gap explanation made all the difference. Outstanding communication." },
+  { name: "Asif J.", route: "Kyrgyzstan Work permit", text: "They cleared up all the regulatory confusion regarding our corporate group paperwork. Highly transparent and reliable." },
+  { name: "Maryam N.", route: "Schengen Tourist Visa", text: "Honest advice on bank statement timelines. They won't file unless they know your matrix meets the threshold." },
 ];
 
 function GalleryPage() {
@@ -74,24 +99,28 @@ function GalleryPage() {
             eyebrow="Client Voices"
             title={<>Words from <span className="text-gold-gradient italic">travelers</span></>}
           />
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {REVIEWS.map((r, i) => (
               <motion.blockquote
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.7 }}
-                className="relative rounded-2xl border border-white/5 glass-panel p-8 gold-glow-hover"
+                transition={{ delay: i * 0.1, duration: 0.7 }}
+                className="relative rounded-2xl border border-white/10 bg-slate-950/40 backdrop-blur-sm p-8 gold-glow-hover flex flex-col justify-between"
               >
-                <Quote className="h-6 w-6 text-gold/60" />
-                <p className="mt-5 font-serif text-lg leading-relaxed italic text-foreground">"{r.text}"</p>
+                <div>
+                  <Quote className="h-6 w-6 text-gold/60" />
+                  <p className="mt-5 font-serif text-lg leading-relaxed italic text-foreground">"{r.text}"</p>
+                </div>
+                
                 <footer className="mt-7 flex items-center justify-between border-t border-white/5 pt-5 text-sm">
                   <div>
-                    <div className="text-foreground">{r.name}</div>
-                    <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{r.route}</div>
+                    <div className="text-foreground font-medium">{r.name}</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mt-0.5">{r.route}</div>
                   </div>
-                  <div className="flex gap-0.5">
+                  <div className="flex gap-0.5 shrink-0">
                     {Array.from({ length: 5 }).map((_, j) => (
                       <Star key={j} className="h-3.5 w-3.5 fill-gold text-gold" />
                     ))}

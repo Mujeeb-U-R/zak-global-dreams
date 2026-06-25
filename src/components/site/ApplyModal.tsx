@@ -5,8 +5,10 @@ import { z } from "zod";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { VISA_CATALOG } from "@/lib/site";
 
+// FIXED: Adjusted schema rules from fullName to dedicated first/last validation hooks
 const schema = z.object({
-  fullName: z.string().trim().min(2, "Please enter your full name").max(100),
+  firstName: z.string().trim().min(2, "Please enter your first name").max(50),
+  lastName: z.string().trim().min(2, "Please enter your last name").max(50),
   phone: z.string().trim().min(7, "Enter a valid phone number").max(20),
   destination: z.string().trim().min(2).max(60),
   category: z.enum(["Work Permit", "Visit Visa", "Group Tour + Visit Visa", "Student Visa"]),
@@ -24,8 +26,10 @@ interface Props {
 }
 
 export function ApplyModal({ isOpen, onClose, preset }: Props) {
+  // FIXED: Adjusted properties to break names into fine structural arrays
   const [form, setForm] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     phone: "",
     destination: "",
     category: "Visit Visa" as (typeof CATEGORIES)[number],
@@ -69,8 +73,16 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
     }
     setErrors({});
     setSubmitting(true);
-    const url = buildWhatsAppUrl(result.data);
-    // small delay for UX polish
+
+    // FIXED: Remapped and structured names dynamically to feed down transparently to buildWhatsAppUrl
+    const { firstName, lastName, ...rest } = result.data;
+    const computedFullName = `${firstName} ${lastName}`.trim();
+
+    const url = buildWhatsAppUrl({
+      fullName: computedFullName,
+      ...rest,
+    });
+
     setTimeout(() => {
       window.open(url, "_blank", "noopener,noreferrer");
       setSubmitting(false);
@@ -113,11 +125,22 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
             </header>
 
             <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
-              <Field label="Full Name" error={errors.fullName} className="sm:col-span-2">
+              
+              {/* FIXED: Removed the blocky single full name box for twin column input cards */}
+              <Field label="First Name" error={errors.firstName}>
                 <input
-                  value={form.fullName}
-                  onChange={(e) => update("fullName", e.target.value)}
-                  placeholder="As on your passport"
+                  value={form.firstName}
+                  onChange={(e) => update("firstName", e.target.value)}
+                  placeholder="Enter your first name"
+                  className="input-base"
+                />
+              </Field>
+
+              <Field label="Last Name" error={errors.lastName}>
+                <input
+                  value={form.lastName}
+                  onChange={(e) => update("lastName", e.target.value)}
+                  placeholder="Enter your last name"
                   className="input-base"
                 />
               </Field>

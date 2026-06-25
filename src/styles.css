@@ -187,3 +187,31 @@
   &::placeholder { color: oklch(0.7 0.08 70); }
   &:focus { border-color: oklch(0.62 0.14 72 / 70%); box-shadow: 0 0 0 3px oklch(0.62 0.14 72 / 15%); }
 }
+
+/* Global hover/focus highlight for interactive elements */
+@layer base {
+  a, button, [role="button"], input[type="submit"], .btn {
+    transition: color 180ms ease, transform 160ms ease, box-shadow 240ms ease, border-color 180ms ease;
+    will-change: transform, box-shadow, opacity;
+  }
+
+  a:hover, button:hover, [role="button"]:hover, input[type="submit"]:hover, .btn:hover {
+    color: var(--color-gold);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-gold);
+  }
+
+  a:focus-visible, button:focus-visible, [role="button"]:focus-visible, input[type="submit"]:focus-visible, .btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px oklch(0.62 0.14 72 / 18%);
+    border-color: oklch(0.62 0.14 72 / 70%);
+  }
+
+  /* Subtle hover for compound link-like elements */
+  .group:hover a, .group:hover button { transform: translateY(-2px); }
+}
+
+/* No lift for nav links */
+@utility nav-link-no-lift {
+  &:hover { transform: none !important; }
+}

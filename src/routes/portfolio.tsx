@@ -39,6 +39,7 @@ function PortfolioPage() {
 
   return (
     <Layout>
+      {/* HERO SECTION */}
       <section className="relative overflow-hidden pb-12">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px]">
           <img
@@ -53,7 +54,7 @@ function PortfolioPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/80 to-slate-950" />
         </div>
-        <div className="mx-auto max-w-7xl px-6 pt-12">
+        <div className="mx-auto max-w-7xl px-6 relative pt-12">
           <SectionHeading
             eyebrow="Visa Portfolio"
             title={<>Every <span className="text-gold-gradient italic">route</span> we file, in one place</>}
@@ -78,62 +79,94 @@ function PortfolioPage() {
         </div>
       </section>
 
+      {/* CARDS SECTION */}
       <section className="pb-28">
         <div className="mx-auto max-w-7xl px-6">
-          <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
-              {cards.map((c) => (
-                <motion.article
-                  key={`${c.category}-${c.country}`}
-                  layout
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="group relative overflow-hidden rounded-2xl border border-white/5 glass-panel p-7 transition-all duration-500 hover:-translate-y-1 gold-glow-hover"
-                >
-                  {COUNTRY_IMAGE[c.country] && (
-                    <>
-                      <img
-                        src={COUNTRY_IMAGE[c.country]}
-                        alt=""
-                        aria-hidden="true"
-                        width={768}
-                        height={512}
-                        loading="lazy"
-                        decoding="async"
-                        className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-25 transition-opacity duration-500 group-hover:opacity-40"
-                      />
-                      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-slate-950/85 via-slate-950/70 to-slate-950/90" />
-                    </>
-                  )}
-                  <div className="relative flex items-center justify-between">
-                    <span className="text-4xl drop-shadow-lg">{COUNTRY_FLAG[c.country] ?? "🌐"}</span>
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-gold">{c.category}</span>
-                  </div>
-                  <h3 className="relative mt-6 font-display text-2xl text-foreground">{c.country}</h3>
-                  <dl className="relative mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-5 text-xs">
-                    <div>
-                      <dt className="flex items-center gap-1.5 text-muted-foreground"><Clock className="h-3 w-3 text-gold" />Processing</dt>
-                      <dd className="mt-1 text-foreground">{c.processing}</dd>
-                    </div>
-                    <div>
-                      <dt className="flex items-center gap-1.5 text-muted-foreground"><CalendarDays className="h-3 w-3 text-gold" />Duration</dt>
-                      <dd className="mt-1 text-foreground">{c.duration}</dd>
-                    </div>
-                  </dl>
+              {cards.map((c) => {
+                const imageSource = COUNTRY_IMAGE[c.country] || COUNTRY_IMAGE[c.country.toLowerCase()];
 
-                  <button
-                    onClick={() => open({ destination: c.country, category: c.category })}
-                    className="relative mt-7 inline-flex w-full items-center justify-between rounded-full border border-gold/40 bg-gold/10 px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-gold backdrop-blur transition hover:bg-gold/20"
+                return (
+                  <motion.article
+                    key={`${c.category}-${c.country}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                    className="group relative overflow-hidden rounded-[32px] border border-white/10 p-7 transition-all duration-500 hover:-translate-y-1 shadow-2xl min-h-[380px] flex flex-col justify-between"
+                    style={{ backgroundColor: "#060a12" }}
                   >
-                    Check Eligibility
-                    <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </button>
-                </motion.article>
-              ))}
+                    {/* BACKGROUND LAYER MATRIX */}
+                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-[32px]">
+                      {imageSource && (
+                        /* FIXED: Heightened baseline opacity to 0.65 and hover to 0.85 so landmarks are completely clear */
+                        <img
+                          src={imageSource}
+                          alt=""
+                          aria-hidden="true"
+                          width={768}
+                          height={512}
+                          loading="eager"
+                          style={{ opacity: 0.65 }}
+                          className="h-full w-full object-cover transition-opacity duration-500 group-hover:!opacity-85 transform scale-100 group-hover:scale-105 duration-700"
+                        />
+                      )}
+                      
+                      {/* FIXED: Lightened the middle (via) area to 30% black opacity so pictures show fully, 
+                          while retaining 95% at the bottom to guarantee text and form button legibility */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-transparent" />
+                    </div>
+
+                    {/* FOREGROUND INTERFACE MATRIX */}
+                    <div className="relative z-20 flex flex-col justify-between h-full w-full flex-1">
+                      
+                      {/* TOP ROW */}
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-4xl drop-shadow-md">{COUNTRY_FLAG[c.country] ?? "🌐"}</span>
+                        <span className="text-[10px] uppercase tracking-[0.25em] text-gold font-mono bg-slate-950/90 px-3 py-1 rounded-full border border-white/10">
+                          {c.category}
+                        </span>
+                      </div>
+
+                      {/* BOTTOM DATA MATRIX */}
+                      <div className="relative mt-auto pt-16">
+                        <h3 className="font-display text-3xl text-white font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                          {c.country}
+                        </h3>
+
+                        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-white/10 pt-4 text-xs">
+                          <div>
+                            <dt className="flex items-center gap-1.5 text-slate-200 font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                              <Clock className="h-3.5 w-3.5 text-gold shrink-0" />
+                              Processing
+                            </dt>
+                            <dd className="mt-1 text-white text-sm font-semibold tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{c.processing}</dd>
+                          </div>
+                          <div>
+                            <dt className="flex items-center gap-1.5 text-slate-200 font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                              <CalendarDays className="h-3.5 w-3.5 text-gold shrink-0" />
+                              Duration
+                            </dt>
+                            <dd className="mt-1 text-white text-sm font-semibold tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{c.duration}</dd>
+                          </div>
+                        </dl>
+
+                        <button
+                          onClick={() => open({ destination: c.country, category: c.category })}
+                          className="relative mt-6 inline-flex w-full items-center justify-between rounded-full border border-gold/60 bg-slate-950/90 px-5 py-3 text-xs uppercase tracking-[0.2em] text-gold backdrop-blur-md transition-all duration-300 hover:bg-gold hover:text-white hover:shadow-[0_4px_20px_rgba(184,137,57,0.4)]"
+                        >
+                          Check Eligibility
+                          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </button>
+                      </div>
+
+                    </div>
+                  </motion.article>
+                );
+              })}
             </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
       </section>
     </Layout>
