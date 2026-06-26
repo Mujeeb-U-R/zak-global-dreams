@@ -8,7 +8,7 @@ interface Props {
   preset?: { destination?: string; category?: string };
 }
 
-export function ApplyButton({ size = "lg", full, label = "Apply Now", preset }: Props) {
+export function ApplyButton({ size = "lg", full, label = "Get Started", preset }: Props) {
   const { open } = useApplyModal();
   const sizing =
     size === "sm" ? "h-9 px-4 text-xs" : "h-12 px-7 text-sm";
