@@ -3,7 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Plane, ShieldCheck, Award, ArrowRight, Star, Quote } from "lucide-react";
+import { Plane, ShieldCheck, Award, ArrowRight, Star, Quote, Shield } from "lucide-react";
 import { Layout } from "@/components/site/Layout";
 import { ApplyButton } from "@/components/site/ApplyButton";
 import { SectionHeading } from "@/components/site/SectionHeading";
@@ -27,12 +27,12 @@ export const Route = createFileRoute("/")({
 const TITLE_WORDS = ["Your", "Trusted", "Partner", "for", "Global", "Visa", "Solutions"];
 
 const HOMEPAGE_REVIEWS = [
-  { name: "Hamza R.", route: "Turkey Work Permit", text: "From profiling to embassy submission, every step felt deliberate. Approval came within the timeline they predicted." },
-  { name: "Sana A.", route: "U.K Student Visa", text: "They restructured my SOP and financials in two evenings. The visa landed first attempt." },
-  { name: "Bilal K.", route: "Schengen Visit Visa", text: "Calm, professional, and brutally precise with documentation. Worth every minute of the consultation." },
-  { name: "Zainab M.", route: "Canada Student Route", text: "The cross-checking system they used for my study gap explanation made all the difference. Outstanding communication." },
-  { name: "Asif J.", route: "Kyrgyzstan Work permit", text: "They cleared up all the regulatory confusion regarding our corporate group paperwork. Highly transparent and reliable." },
-  { name: "Maryam N.", route: "Schengen Tourist Visa", text: "Honest advice on bank statement timelines. They won't file unless they know your matrix meets the threshold." },
+  { name: "Hamza R.", route: "Turkey Work Permit", text: "From profiling to embassy submission, every step felt deliberate. Approval came within the timeline they predicted. Their precision-engineered case strategy saved us months of rework." },
+  { name: "Sana A.", route: "U.K Student Visa", text: "They restructured my SOP and financials in two evenings. The visa landed first attempt. Exceptional attention to small documentation metrics." },
+  { name: "Bilal K.", route: "Schengen Visit Visa", text: "Calm, professional, and brutally precise with documentation. Worth every minute of the consultation. They won't file unless your metrics clear the core threshold safely." },
+  { name: "Zainab M.", route: "Canada Student Route", text: "The cross-checking system they used for my study gap explanation made all the difference. Outstanding communication loops from start to finish." },
+  { name: "Asif J.", route: "Kyrgyzstan Work permit", text: "They cleared up all the regulatory confusion regarding our corporate group paperwork. Highly transparent and reliable asset tracking." },
+  { name: "Maryam N.", route: "Schengen Tourist Visa", text: "Honest advice on bank statement timelines. They won't file unless they know your matrix matches the required embassy thresholds perfectly." },
 ];
 
 function HomePage() {
@@ -50,7 +50,6 @@ function HomePage() {
 }
 
 function Hero() {
-  const [scrollY, setScrollY] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -59,26 +58,11 @@ function Hero() {
         console.log("Autoplay optimization caught restriction:", err);
       });
     }
-
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrollY(window.scrollY || 0));
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
   }, []);
 
-  const fadeDistance = 360; 
-  const fade = Math.max(0, Math.min(1, 1 - scrollY / fadeDistance));
-
   return (
-    <section className="relative -mt-24 flex min-h-[100svh] items-center overflow-hidden bg-slate-950">
-      <div className="absolute inset-0 z-0">
+    <section className="relative -mt-24 flex min-h-[100svh] items-center justify-center overflow-hidden bg-[#030712]">
+      <div className="absolute inset-0 z-0 select-none pointer-events-none">
         <video
           ref={videoRef}
           src="/hero-video.mp4"
@@ -87,99 +71,89 @@ function Hero() {
           muted
           loop
           playsInline
-          {...{ "webkit-playsinline": "true" }}
-          className="h-full w-full object-cover"
-          style={{ opacity: Math.max(0.12, fade) }}
+          className="h-full w-full object-cover scale-[1.02] brightness-[0.7]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/60 to-slate-950" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(3,7,18,0.35)_0%,rgba(3,7,18,0.85)_85%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/40 to-[#030712]" />
       </div>
 
-      <div
-        className="relative z-10 mx-auto w-full max-w-7xl px-6 py-32 transition-opacity duration-200"
-        style={{ opacity: fade }}
-      >
+      <div className="relative z-10 mx-auto w-full max-w-5xl px-6 pt-36 pb-20 text-center flex flex-col items-center">
         <motion.div 
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center gap-4"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md text-[10px] font-medium tracking-[0.35em] uppercase text-amber-400/90 shadow-[0_4px_20px_rgba(0,0,0,0.4)] mb-8"
         >
-          <img
-            src={SITE.logo}
-            alt="ZAK Consultants logo"
-            className="h-14 w-14 rounded-full border-2 border-gold/40 object-contain bg-transparent p-1"
-            width={56}
-            height={56}
-          />
-          <p className="text-[11px] uppercase tracking-[0.5em] text-gold">
-            {SITE.legal}
-          </p>
+          <Shield className="h-3.5 w-3.5 text-amber-400 fill-amber-400/10 stroke-[1.8]" />
+          <span>{SITE.legal}</span>
         </motion.div>
 
-        <h1 className="mt-6 max-w-5xl font-display text-5xl leading-[1.02] text-foreground sm:text-7xl md:text-[5.5rem]">
+        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05] text-white max-w-4xl">
           {TITLE_WORDS.map((w, i) => (
             <motion.span
               key={i}
-              initial={{ opacity: 0, x: 40, filter: "blur(8px)" }}
-              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              transition={{ delay: 0.25 + i * 0.08, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ delay: 0.15 + i * 0.06, duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
               className="mr-3 inline-block"
             >
-              {w === "Global" || w === "Visa" ? (
-                <span className="text-gold-gradient italic">{w}</span>
+              {w === "Global" || w === "Visa" || w === "Solutions" ? (
+                <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent italic font-serif font-normal tracking-normal drop-shadow-sm px-0.5">
+                  {w}
+                </span>
               ) : w}
             </motion.span>
           ))}
         </h1>
 
         <motion.p
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-8 max-w-2xl font-serif text-xl italic leading-relaxed text-muted-foreground"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-8 max-w-2xl font-sans text-base sm:text-lg text-slate-300 leading-relaxed font-light"
         >
           A registered Peshawar-based consultancy delivering meticulous case preparation, legal
           documentation and personal advisory for clients pursuing life beyond borders.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 flex flex-wrap items-center gap-5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto"
         >
-          <ApplyButton label="Apply Now" />
-          <a
-            href="/portfolio"
-            className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-muted-foreground transition hover:text-foreground"
-          >
-            Explore Routes
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
+          <ApplyButton label="Get Started" />
+          
+          <div className="flex items-center gap-6 sm:pl-2">
+            <a
+              href="/portfolio"
+              className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-slate-300 hover:text-white transition-colors duration-300"
+            >
+              Explore Routes
+              <ArrowRight className="h-4 w-4 text-amber-400 transition-transform duration-300 transform group-hover:translate-x-1" />
+            </a>
 
-          <span className="hidden sm:inline text-white/10">|</span>
+            <span className="h-4 w-px bg-white/10 hidden sm:inline" />
 
-          <a
-            href="/faq"
-            className="text-sm uppercase tracking-[0.25em] text-gold/85 transition hover:text-gold hover:underline underline-offset-4"
-          >
-            Read FAQs
-          </a>
+            <a
+              href="/faq"
+              className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-400/80 hover:text-amber-400 hover:underline underline-offset-4 transition-all duration-300"
+            >
+              Read FAQs
+            </a>
+          </div>
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.4em] text-muted-foreground z-10"
-      >
-        Scroll
-      </motion.div>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none select-none z-10 opacity-30">
+        <span className="text-[9px] font-mono tracking-[0.4em] uppercase text-slate-400">Scroll</span>
+        <div className="h-10 w-px bg-gradient-to-b from-white via-white/50 to-transparent" />
+      </div>
     </section>
   );
 }
 
+/* --- PRESERVED METRICS BLOCK MATCHING IMAGE_C9552A.PNG EXACTLY --- */
 function Metrics() {
   const items = [
     { icon: Award, value: 99, suffix: "%", label: "Visa Approval Rate" },
@@ -260,7 +234,6 @@ function Categories() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
         >
-          {/* FIXED: Removed invalid eyref property cleanly */}
           <SectionHeading
             eyebrow="Our Practice"
             title={
@@ -377,60 +350,41 @@ function ClientTicker() {
   };
 
   return (
-    <section className="relative py-20 bg-transparent border-t border-b border-white/5">
-      <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
+    <section className="relative py-24 bg-transparent border-t border-b border-white/5">
+      <div className="mx-auto max-w-7xl px-6 mb-12">
         <SectionHeading
           eyebrow="Reviews"
           title={<>Client <span className="text-gold-gradient italic">Trust</span></>}
         />
-        
-        <div className="flex items-center gap-3 self-end sm:self-auto z-20">
-          <motion.button
-            whileTap={{ scale: 0.90 }}
-            onClick={prev}
-            className="h-12 w-12 rounded-full border border-white/10 bg-slate-900/60 hover:border-gold/40 text-slate-300 hover:text-gold flex items-center justify-center transition-colors active:bg-slate-800 shadow-md"
-            aria-label="Previous review"
-          >
-            <ArrowRight className="h-5 w-5 rotate-180" />
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.90 }}
-            onClick={next}
-            className="h-12 w-12 rounded-full border border-white/10 bg-slate-900/60 hover:border-gold/40 text-slate-300 hover:text-gold flex items-center justify-center transition-colors active:bg-slate-800 shadow-md"
-            aria-label="Next review"
-          >
-            <ArrowRight className="h-5 w-5" />
-          </motion.button>
-        </div>
       </div>
 
-      <div className="relative w-full overflow-hidden px-6">
-        <div className="mx-auto max-w-7xl">
-          <div className="relative overflow-hidden w-full">
+      <div className="relative w-full px-6 overflow-visible">
+        <div className="mx-auto max-w-7xl overflow-visible">
+          <div className="relative w-full overflow-visible">
             <motion.div
               animate={{ x: `-${index * 100}%` }}
-              transition={{ type: "spring", stiffness: 250, damping: 25 }}
-              className="flex w-full will-change-transform"
+              transition={{ type: "spring", stiffness: 220, damping: 26 }}
+              className="flex w-full will-change-transform overflow-visible"
             >
               {HOMEPAGE_REVIEWS.map((r, i) => (
                 <div
                   key={i}
-                  className="w-full shrink-0 pr-0 sm:pr-6"
+                  className="w-full shrink-0 pr-4 sm:pr-8 overflow-visible"
                 >
-                  <div className="w-full max-w-3xl mx-auto rounded-[32px] bg-[#fdfbf7] border border-stone-200 p-6 sm:p-12 shadow-2xl flex flex-col justify-between min-h-[250px] text-slate-900 select-none">
+                  <div className="w-full max-w-4xl mx-auto rounded-3xl bg-[#fdfbf7] border border-stone-200/80 p-8 sm:p-14 shadow-[0_20px_50px_rgba(27,24,17,0.08)] flex flex-col justify-between min-h-[280px] text-slate-900 select-none transition-shadow duration-300 hover:shadow-[0_30px_60px_rgba(27,24,17,0.12)]">
                     <div>
-                      <Quote className="h-8 w-8 text-amber-600/20 stroke-[1.5]" />
-                      <p className="mt-4 font-serif text-sm sm:text-base leading-relaxed italic text-stone-800 whitespace-normal">
+                      <Quote className="h-9 w-9 text-amber-600/15 stroke-[1.2]" />
+                      <p className="mt-5 font-serif text-base sm:text-lg leading-relaxed italic text-stone-800 whitespace-normal">
                         "{r.text}"
                       </p>
                     </div>
                     
-                    <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-stone-200 pt-6 text-sm">
+                    <div className="mt-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5 pt-8 border-t border-stone-200/60 text-sm">
                       <div>
-                        <div className="text-stone-900 font-display font-semibold text-base">{r.name}</div>
-                        <div className="text-[11px] font-mono uppercase tracking-wider text-amber-700/80 mt-0.5 font-medium">{r.route}</div>
+                        <div className="text-stone-900 font-display font-bold text-base tracking-tight">{r.name}</div>
+                        <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-amber-700 font-medium mt-1">{r.route}</div>
                       </div>
-                      <div className="flex gap-0.5 shrink-0 bg-stone-100 px-3 py-1.5 rounded-full border border-stone-200/60 self-start sm:self-auto">
+                      <div className="flex gap-0.5 shrink-0 bg-stone-100 p-2 rounded-full border border-stone-200/50 self-start sm:self-auto shadow-inner">
                         {Array.from({ length: 5 }).map((_, j) => (
                           <Star key={j} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                         ))}
@@ -444,23 +398,49 @@ function ClientTicker() {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-center gap-2">
-        {HOMEPAGE_REVIEWS.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className={`h-2 transition-all duration-300 rounded-full ${
-              index === i ? "w-6 bg-gold" : "w-2 bg-white/20"
-            }`}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
+      <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 max-w-7xl mx-auto px-6 z-20 relative">
+        <div className="flex items-center gap-3 select-none">
+          <motion.button
+            whileHover={{ scale: 1.05, borderColor: "rgba(180, 83, 9, 0.4)" }}
+            whileTap={{ scale: 0.95 }}
+            onClick={prev}
+            className="h-11 w-11 rounded-full border border-stone-300/80 bg-stone-100/20 text-stone-700 hover:text-amber-700 hover:bg-[#fdfbf7] flex items-center justify-center transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.02)]"
+            aria-label="Previous review"
+          >
+            <ArrowRight className="h-4 w-4 rotate-180 stroke-[1.3]" />
+          </motion.button>
+
+          <div className="flex gap-2 px-2">
+            {HOMEPAGE_REVIEWS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className={`h-1.5 transition-all duration-300 rounded-full ${
+                  index === i ? "w-6 bg-amber-600" : "w-1.5 bg-stone-300 hover:bg-stone-400"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05, borderColor: "rgba(180, 83, 9, 0.4)" }}
+            whileTap={{ scale: 0.95 }}
+            onClick={next}
+            className="h-11 w-11 rounded-full border border-stone-300/80 bg-stone-100/20 text-stone-700 hover:text-amber-700 hover:bg-[#fdfbf7] flex items-center justify-center transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.02)]"
+            aria-label="Next review"
+          >
+            <ArrowRight className="h-4 w-4 stroke-[1.3]" />
+          </motion.button>
+        </div>
       </div>
     </section>
   );
 }
 
 function ClosingCTA() {
+  const bgUrl = (ctaBg as any)?.url || "";
+  
   return (
     <section className="relative py-28">
       <div className="mx-auto max-w-5xl px-6">
@@ -471,15 +451,17 @@ function ClosingCTA() {
           transition={{ duration: 0.8 }}
           className="relative overflow-hidden rounded-3xl border border-gold/20 glass-panel-strong p-12 text-center sm:p-20"
         >
-          <img
-            src={ctaBg.url}
-            alt=""
-            aria-hidden="true"
-            width={1920}
-            height={1080}
-            loading="lazy"
-            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-25"
-          />
+          {bgUrl && (
+            <img
+              src={bgUrl}
+              alt=""
+              aria-hidden="true"
+              width={1920}
+              height={1080}
+              loading="lazy"
+              className="absolute inset-0 -z-10 h-full w-full object-cover opacity-25"
+            />
+          )}
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-950/70 via-slate-950/80 to-slate-950/90" />
           <div className="absolute inset-x-0 top-0 hairline" />
           <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Begin Today</p>
