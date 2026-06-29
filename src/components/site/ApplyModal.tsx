@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2, CheckCircle } from "lucide-react";
 import { z } from "zod";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { VISA_CATALOG } from "@/lib/site";
 
 const schema = z.object({
@@ -35,17 +34,16 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
     bankStatement: "Yes" as "Yes" | "No",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState<"IDLE" | "SUBMITTING" | "SUCCESS" | "ERROR">("IDLE");
 
   useEffect(() => {
     if (isOpen && preset) {
       setForm((f) => ({
         ...f,
         destination: preset.destination ?? f.destination,
-        category:
-          (CATEGORIES as readonly string[]).includes(preset.category ?? "")
-            ? (preset.category as (typeof CATEGORIES)[number])
-            : f.category,
+        category: (CATEGORIES as readonly string[]).includes(preset.category ?? "")
+          ? (preset.category as (typeof CATEGORIES)[number])
+          : f.category,
       }));
     }
   }, [isOpen, preset]);
@@ -58,9 +56,10 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const handleFormspreeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = schema.safeParse(form);
+    
     if (!result.success) {
       const errs: Record<string, string> = {};
       for (const issue of result.error.issues) {
@@ -69,22 +68,50 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
       setErrors(errs);
       return;
     }
+    
     setErrors({});
-    setSubmitting(true);
+    setFormStatus("SUBMITTING");
 
     const { firstName, lastName, ...rest } = result.data;
     const computedFullName = `${firstName} ${lastName}`.trim();
 
-    const url = buildWhatsAppUrl({
-      fullName: computedFullName,
-      ...rest,
-    });
+    try {
+      const response = await fetch("https://formspree.io/f/mjgqoevn", { // <--- Paste your actual Formspree form ID string here
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: computedFullName,
+          ...rest
+        }),
+      });
 
-    setTimeout(() => {
-      window.open(url, "_blank", "noopener,noreferrer");
-      setSubmitting(false);
-      onClose();
-    }, 500);
+      if (response.ok) {
+        setFormStatus("SUCCESS");
+        setForm({
+          firstName: "",
+          lastName: "",
+          phone: "",
+          destination: "",
+          category: "Visit Visa",
+          employment: "Employed",
+          bankStatement: "Yes",
+        });
+        
+        // Hold the premium popup modal explicitly before closing the view down entirely
+        setTimeout(() => {
+          setFormStatus("IDLE");
+          onClose();
+        }, 2500);
+      } else {
+        setFormStatus("ERROR");
+      }
+    } catch (err) {
+      console.error("Formspree data transmission failed:", err);
+      setFormStatus("ERROR");
+    }
   };
 
   return (
@@ -96,25 +123,52 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
         >
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
 
-          {/* OPTIMIZED: Added max-h-[85vh] and flex-col to force the popup to remain perfectly sized inside mobile frames */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-none glass-panel-strong rounded-3xl p-6 sm:p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] flex flex-col"
+            className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-none glass-panel-strong rounded-3xl p-6 sm:p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden"
           >
-            {/* FIXED Close button coordinate system – forced outside of the inner scrolling frame */}
+            {/* Close Button Trigger */}
             <motion.button
               whileTap={{ scale: 0.90 }}
               onClick={onClose}
-              className="absolute right-4 top-4 z-50 p-2.5 rounded-full border border-white/10 bg-slate-900/95 text-gold shadow-md backdrop-blur-sm transition-colors hover:border-gold/40 hover:text-foreground active:bg-slate-800 flex items-center justify-center"
+              className="absolute right-4 top-4 z-50 p-2.5 rounded-full border border-white/10 bg-slate-900/95 text-gold shadow-md backdrop-blur-sm transition-colors hover:border-gold/40 hover:text-foreground flex items-center justify-center"
               aria-label="Close"
             >
               <X className="h-5 w-5" />
             </motion.button>
 
-            {/* OPTIMIZED INNER CONTENT VIEW: Forms scroll safely on mobile while header and close handlers stay pinned and visible */}
+            {/* --- PREMIUM DYNAMIC POPUP OVERLAY PANEL FOR SUCCESS STATES --- */}
+            <AnimatePresence>
+              {formStatus === "SUCCESS" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center text-center p-8"
+                >
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 15 }}
+                    className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]"
+                  >
+                    <CheckCircle className="h-8 w-8 stroke-[1.5]" />
+                  </motion.div>
+                  
+                  <h3 className="font-display text-2xl sm:text-3xl text-white font-medium tracking-tight">
+                    Form sent successfully!
+                  </h3>
+                  <p className="mt-3 text-sm text-slate-400 max-w-sm font-light leading-relaxed">
+                    Your assessment portfolio has been routed to our compliance desk. A senior consultant will follow up shortly.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Main Form Fields Container */}
             <div className="overflow-y-auto pr-2 sm:pr-0 scrollbar-thin w-full flex-1">
               <header className="mb-8 pr-12">
                 <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Visa Assessment</p>
@@ -122,12 +176,11 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                   Begin your <span className="text-gold-gradient">journey</span>
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Share a few details. We'll route you directly to a senior consultant on WhatsApp.
+                  Share your background metrics. Our compliance unit will assess your credentials and dispatch strategy data straight to your email inbox.
                 </p>
               </header>
 
-              <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
-                
+              <form onSubmit={handleFormspreeSubmit} className="grid gap-5 sm:grid-cols-2">
                 <Field label="First Name" error={errors.firstName}>
                   <input
                     value={form.firstName}
@@ -153,7 +206,7 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                     type="tel"
                     placeholder="+92 3xx xxxxxxx"
                     className="input-base text-base"
-                />
+                  />
                 </Field>
 
                 <Field label="Destination Country" error={errors.destination}>
@@ -199,10 +252,10 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                         key={v}
                         type="button"
                         onClick={() => update("bankStatement", v)}
-                        className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition active:scale-[0.99] ${
+                        className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition ${
                           form.bankStatement === v
                             ? "border-gold/60 bg-gold/10 text-gold"
-                            : "border-white/10 text-muted-foreground active:bg-white/5 active:border-white/20"
+                            : "border-white/10 text-muted-foreground"
                         }`}
                       >
                         {v}
@@ -212,17 +265,31 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
                 </Field>
 
                 <div className="sm:col-span-2 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5 pt-6 pb-2">
-                  <p className="text-xs text-muted-foreground text-center sm:text-left">
-                    Opens WhatsApp with your details pre-filled.
-                  </p>
+                  <div className="text-center sm:text-left min-h-[32px] flex items-center">
+                    {formStatus === "ERROR" && (
+                      <p className="text-xs text-rose-400 font-medium">
+                        Transmission error. Please verify fields and try again.
+                      </p>
+                    )}
+                    {formStatus === "SUBMITTING" && (
+                      <p className="text-xs text-amber-400 font-medium animate-pulse">
+                        Encrypting portfolio records...
+                      </p>
+                    )}
+                  </div>
+                  
                   <motion.button
                     whileTap={{ scale: 0.97 }}
                     type="submit"
-                    disabled={submitting}
-                    className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform disabled:opacity-60"
+                    disabled={formStatus === "SUBMITTING"}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow transition-all disabled:opacity-50"
                   >
-                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                    Send via WhatsApp
+                    {formStatus === "SUBMITTING" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                    Submit Profile
                   </motion.button>
                 </div>
               </form>

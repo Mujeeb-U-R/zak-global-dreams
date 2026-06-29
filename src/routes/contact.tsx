@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Clock, MessageCircle, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, Phone, Mail, Clock, MessageCircle, Send, Loader2, CheckCircle } from "lucide-react";
 import { Layout } from "@/components/site/Layout";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { SITE } from "@/lib/site";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import contactHero from "@/assets/contact-hero.jpg.asset.json";
 
 export const Route = createFileRoute("/contact")({
@@ -21,28 +20,52 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  // FIXED: Separated the single state context to handle separate tracking blocks cleanly
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState("");
+  const [formStatus, setFormStatus] = useState<"IDLE" | "SUBMITTING" | "SUCCESS" | "ERROR">("IDLE");
 
-  const send = (e: React.FormEvent) => {
+  const send = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormStatus("SUBMITTING");
     
-    // Combine names gracefully, defaulting back to 'Quick Inquiry' if blank values slip through
     const computedFullName = `${firstName} ${lastName}`.trim() || "Quick Inquiry";
 
-    const url = buildWhatsAppUrl({
-      fullName: computedFullName,
-      phone: phone || "—",
-      destination: "—",
-      category: "General Inquiry",
-      employment: "—",
-      bankStatement: "No",
-    });
-    const intro = encodeURIComponent(`\n\n*Message:* ${msg || "(no message)"}`);
-    window.open(url + intro, "_blank", "noopener,noreferrer");
+    try {
+      // --- FORMSPREE BACKEND INTEGRATION TRANSMISSION ---
+      const response = await fetch("https://formspree.io/f/mjgqoevn", { // <--- Paste your actual Formspree form ID string here
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: computedFullName,
+          phone: phone || "—",
+          visaCategory: "General Inquiry",
+          message: msg || "(no message)",
+        }),
+      });
+
+      if (response.ok) {
+        setFormStatus("SUCCESS");
+        setFirstName("");
+        setLastName("");
+        setPhone("");
+        setMsg("");
+        
+        // Retain success overlay briefly for an premium user pacing layout experience
+        setTimeout(() => {
+          setFormStatus("IDLE");
+        }, 3500);
+      } else {
+        setFormStatus("ERROR");
+      }
+    } catch (error) {
+      console.error("Contact Formspree submission error context handler:", error);
+      setFormStatus("ERROR");
+    }
   };
 
   return (
@@ -56,7 +79,6 @@ function ContactPage() {
             width={1920}
             height={1080}
             fetchPriority="high"
-            decoding="async"
             className="h-full w-full object-cover opacity-35"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/80 to-slate-950" />
@@ -65,7 +87,7 @@ function ContactPage() {
           <SectionHeading
             eyebrow="Get in touch"
             title={<>Visit us in <span className="text-gold-gradient italic">Peshawar</span></>}
-            intro="Walk in, dial in, or message us on WhatsApp. A senior consultant will respond personally."
+            intro="Walk in, dial in, or securely deliver your case parameters online. A senior consultant will respond personally."
           />
         </div>
       </section>
@@ -106,40 +128,84 @@ function ContactPage() {
           <motion.form
             onSubmit={send}
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="h-fit rounded-3xl border border-white/5 glass-panel-strong p-8 sm:p-10"
+            className="relative h-fit rounded-3xl border border-white/5 glass-panel-strong p-8 sm:p-10 overflow-hidden"
           >
+            {/* --- PREMIUM POPUP MESSAGE OVERLAY FOR CONTACT CONFIRMATIONS --- */}
+            <AnimatePresence>
+              {formStatus === "SUCCESS" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center text-center p-8"
+                >
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 15 }}
+                    className="h-14 w-14 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mb-5 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
+                  >
+                    <CheckCircle className="h-7 w-7 stroke-[1.5]" />
+                  </motion.div>
+                  
+                  <h3 className="font-display text-2xl text-white font-medium tracking-tight">
+                    Form sent successfully!
+                  </h3>
+                  <p className="mt-3 text-sm text-slate-400 max-w-sm font-light leading-relaxed">
+                    Your inquiry has been safely channeled to our corporate intake desk. A senior case representative will contact you via email shortly.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="flex items-center gap-3">
               <MessageCircle className="h-5 w-5 text-gold" />
               <h3 className="font-display text-2xl text-foreground">Quick inquiry</h3>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">Sends directly to our WhatsApp.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Dispatches instantly to our consultancy email inbox routing system.</p>
 
             <div className="mt-7 grid gap-5">
-              
-              {/* FIXED: Replaced standard full name element with twin input elements layout split */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2">
                   <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">First Name</span>
-                  <input required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="input-base" placeholder="First name" />
+                  <input required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="input-base" placeholder="First name" disabled={formStatus === "SUBMITTING"} />
                 </label>
                 <label className="flex flex-col gap-2">
                   <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Last Name</span>
-                  <input required value={lastName} onChange={(e) => setLastName(e.target.value)} className="input-base" placeholder="Last name" />
+                  <input required value={lastName} onChange={(e) => setLastName(e.target.value)} className="input-base" placeholder="Last name" disabled={formStatus === "SUBMITTING"} />
                 </label>
               </div>
 
               <label className="flex flex-col gap-2">
                 <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Phone</span>
-                <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="input-base" placeholder="+92 3xx xxxxxxx" />
+                <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="input-base" placeholder="+92 3xx xxxxxxx" disabled={formStatus === "SUBMITTING"} />
               </label>
               
               <label className="flex flex-col gap-2">
                 <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Message</span>
-                <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={4} className="input-base resize-none" placeholder="Tell us where you'd like to travel..." />
+                <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={4} className="input-base resize-none" placeholder="Tell us where you'd like to travel..." disabled={formStatus === "SUBMITTING"} />
               </label>
+
+              <div className="min-h-[20px] mt-1">
+                {formStatus === "ERROR" && (
+                  <p className="text-xs text-rose-400 font-medium">
+                    Transmission error. Please check your network and try again.
+                  </p>
+                )}
+                {formStatus === "SUBMITTING" && (
+                  <p className="text-xs text-amber-400 font-medium animate-pulse">
+                    Synchronizing case inquiry telemetry...
+                  </p>
+                )}
+              </div>
               
-              <button type="submit" className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform hover:scale-[1.02]">
-                <Send className="h-4 w-4" /> Send via WhatsApp
+              <button 
+                type="submit" 
+                disabled={formStatus === "SUBMITTING"}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 gold-glow gold-glow-hover transition-transform hover:scale-[1.02] disabled:opacity-50"
+              >
+                {formStatus === "SUBMITTING" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Submit Inquiry
               </button>
             </div>
           </motion.form>
