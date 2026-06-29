@@ -34,7 +34,7 @@ function ContactPage() {
 
     try {
       // --- FORMSPREE BACKEND INTEGRATION TRANSMISSION ---
-      const response = await fetch("https://formspree.io/f/mjgqoevn", { // <--- Paste your actual Formspree form ID string here
+      const response = await fetch("https://formspree.io/f/mjgqoevn", {
         method: "POST",
         headers: {
           "Accept": "application/json",
@@ -130,14 +130,14 @@ function ContactPage() {
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="relative h-fit rounded-3xl border border-white/5 glass-panel-strong p-8 sm:p-10 overflow-hidden"
           >
-            {/* --- PREMIUM POPUP MESSAGE OVERLAY FOR CONTACT CONFIRMATIONS --- */}
+            {/* --- FIXED VIEWPORT POPUP OVERLAY PANEL FOR SUCCESS STATES --- */}
             <AnimatePresence>
               {formStatus === "SUCCESS" && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center text-center p-8"
+                  className="absolute fixed inset-0 z-[60] bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center text-center p-6"
                 >
                   <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
@@ -148,10 +148,10 @@ function ContactPage() {
                     <CheckCircle className="h-7 w-7 stroke-[1.5]" />
                   </motion.div>
                   
-                  <h3 className="font-display text-2xl text-white font-medium tracking-tight">
+                  <h3 className="font-display text-2xl text-white font-medium tracking-tight px-4">
                     Form sent successfully!
                   </h3>
-                  <p className="mt-3 text-sm text-slate-400 max-w-sm font-light leading-relaxed">
+                  <p className="mt-3 text-sm text-slate-400 max-w-sm font-light leading-relaxed px-6">
                     Your inquiry has been safely channeled to our corporate intake desk. A senior case representative will contact you via email shortly.
                   </p>
                 </motion.div>

@@ -76,7 +76,7 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
     const computedFullName = `${firstName} ${lastName}`.trim();
 
     try {
-      const response = await fetch("https://formspree.io/f/mjgqoevn", { // <--- Paste your actual Formspree form ID string here
+      const response = await fetch("https://formspree.io/f/mjgqoevn", {
         method: "POST",
         headers: {
           "Accept": "application/json",
@@ -100,7 +100,6 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
           bankStatement: "Yes",
         });
         
-        // Hold the premium popup modal explicitly before closing the view down entirely
         setTimeout(() => {
           setFormStatus("IDLE");
           onClose();
@@ -140,28 +139,28 @@ export function ApplyModal({ isOpen, onClose, preset }: Props) {
               <X className="h-5 w-5" />
             </motion.button>
 
-            {/* --- PREMIUM DYNAMIC POPUP OVERLAY PANEL FOR SUCCESS STATES --- */}
+            {/* --- FIXED VIEWPORT POPUP OVERLAY PANEL FOR SUCCESS STATES --- */}
             <AnimatePresence>
               {formStatus === "SUCCESS" && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center text-center p-8"
+                  className="absolute inset-0 z-[60] bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center text-center p-6"
                 >
                   <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 15 }}
-                    className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]"
+                    className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
                   >
                     <CheckCircle className="h-8 w-8 stroke-[1.5]" />
                   </motion.div>
                   
-                  <h3 className="font-display text-2xl sm:text-3xl text-white font-medium tracking-tight">
+                  <h3 className="font-display text-2xl sm:text-3xl text-white font-medium tracking-tight px-4">
                     Form sent successfully!
                   </h3>
-                  <p className="mt-3 text-sm text-slate-400 max-w-sm font-light leading-relaxed">
+                  <p className="mt-3 text-sm text-slate-400 max-w-sm font-light leading-relaxed px-6">
                     Your assessment portfolio has been routed to our compliance desk. A senior consultant will follow up shortly.
                   </p>
                 </motion.div>
