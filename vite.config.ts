@@ -5,19 +5,14 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { nitro } from "nitro/vite";
 
 export default defineConfig({
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    // Redirect TanStack Start's bundled server entry to src/server.ts
     server: { entry: "server" },
   },
   vite: {
-    plugins: [
-      nitro({
-        preset: "vercel",
-      }),
-    ],
+    // Force Vite to explicitly bundle your root public directory files
+    publicDir: "public",
   },
 });
