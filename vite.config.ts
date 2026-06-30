@@ -1,3 +1,5 @@
-import { defineLovableTanstackConfig } from "@lovable.dev/vite-tanstack-config";
+import pkg from "@lovable.dev/vite-tanstack-config";
 
-export default defineLovableTanstackConfig();
+const { defineConfig } = pkg;
+
+export default defineConfig();
