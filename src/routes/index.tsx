@@ -72,7 +72,7 @@ function Hero() {
       });
     }
   }, []);
-
+<div>data-version="2.0.0"</div>
   return (
     <section className="relative -mt-24 flex min-h-[100svh] items-center justify-center overflow-hidden bg-[#030712]">
       <div className="absolute inset-0 z-0 select-none pointer-events-none">
