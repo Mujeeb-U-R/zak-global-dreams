@@ -1,3 +1,6 @@
+[[plugins]]
+  package = "@netlify/plugin-bun"
+
 [build]
   command = "bun run build"
   publish = ".output/public"
