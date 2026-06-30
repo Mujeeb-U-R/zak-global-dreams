@@ -11,7 +11,7 @@ import { SITE, VISA_CATALOG } from "@/lib/site";
 import heroPoster from "@/assets/hero-poster.jpg";
 import ctaBg from "@/assets/cta-bg.jpg.asset.json";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/index copy")({
   head: () => ({
     meta: [
       { title: "ZAK Consultants — Global Visa Solutions" },
